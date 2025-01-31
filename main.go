@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"passwordKeep/account"
 )
 
 func main() {
 	showMenu()
-	//createAccount()
 }
 
 func showMenu() {
@@ -38,7 +38,16 @@ Menu:
 }
 
 func findAccount() {
+	var url string
+	fmt.Println("Введите URL для поиска")
+	fmt.Scanln(&url)
+	findsAccount, err := account.SearchAccount(url)
 
+	if err != nil {
+		color.Red(err.Error())
+	}
+
+	fmt.Println(findsAccount)
 }
 
 func deleteAccount() {

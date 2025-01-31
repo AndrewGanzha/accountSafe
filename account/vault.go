@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/fatih/color"
 	"passwordKeep/files"
+	"strings"
 	"time"
 )
 
@@ -45,6 +46,20 @@ func (vault *Vault) AddAccount(account Account) {
 		color.Red("Не удалось преобразовать файл data.json")
 	}
 	files.WriteFile(data, "data.json")
+}
+
+func SearchAccount(search string) ([]Account, error) {
+	vault := NewVault()
+	var includesAccount []Account
+
+	for _, account := range vault.Accounts {
+
+		if strings.Contains(account.Url, search) {
+			includesAccount = append(includesAccount, account)
+		}
+	}
+
+	return includesAccount, nil
 }
 
 func (vault *Vault) ToBytes() ([]byte, error) {
