@@ -12,6 +12,7 @@ func main() {
 
 func showMenu() {
 	fmt.Println("Добро пожаловать в программу гененрации и получения паролей!")
+	vault := account.NewVault()
 
 Menu:
 	for {
@@ -25,9 +26,9 @@ Menu:
 
 		switch input {
 		case "1":
-			createAccount()
+			createAccount(vault)
 		case "2":
-			findAccount()
+			findAccount(vault)
 		case "3":
 			deleteAccount()
 		case "4":
@@ -37,31 +38,31 @@ Menu:
 	}
 }
 
-func findAccount() {
+func findAccount(vault *account.Vault) {
 	var url string
 	fmt.Println("Введите URL для поиска")
 	fmt.Scanln(&url)
-	findsAccount, err := account.SearchAccount(url)
+	findsAccount, err := vault.SearchAccount(url)
 
 	if err != nil {
 		color.Red(err.Error())
 	}
 
-	fmt.Println(findsAccount)
+	for _, findAccount := range findsAccount {
+		findAccount.Output()
+	}
 }
 
 func deleteAccount() {
 
 }
 
-func createAccount() {
+func createAccount(vault *account.Vault) {
 	myAccount, err := account.NewAccount()
 
 	if err != nil {
 		fmt.Println("Неверный формат данных")
 		return
 	}
-
-	vault := account.NewVault()
 	vault.AddAccount(*myAccount)
 }

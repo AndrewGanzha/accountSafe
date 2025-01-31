@@ -48,8 +48,7 @@ func (vault *Vault) AddAccount(account Account) {
 	files.WriteFile(data, "data.json")
 }
 
-func SearchAccount(search string) ([]Account, error) {
-	vault := NewVault()
+func (vault *Vault) SearchAccount(search string) ([]Account, error) {
 	var includesAccount []Account
 
 	for _, account := range vault.Accounts {
