@@ -7,7 +7,43 @@ import (
 )
 
 func main() {
-	createAccount()
+	showMenu()
+	//createAccount()
+}
+
+func showMenu() {
+	fmt.Println("Добро пожаловать в программу гененрации и получения паролей!")
+
+Menu:
+	for {
+		var input string
+		fmt.Println("1. Добавить аккаунт")
+		fmt.Println("2. Найти аккаунт")
+		fmt.Println("3. Удалить аккаунт")
+		fmt.Println("4. Выход")
+
+		fmt.Scanln(&input)
+
+		switch input {
+		case "1":
+			createAccount()
+		case "2":
+			findAccount()
+		case "3":
+			deleteAccount()
+		case "4":
+			fmt.Println("До свидания!")
+			break Menu
+		}
+	}
+}
+
+func findAccount() {
+
+}
+
+func deleteAccount() {
+
 }
 
 func createAccount() {
@@ -18,12 +54,14 @@ func createAccount() {
 		return
 	}
 
-	file, err := myAccount.ToBytes()
+	vault := account.NewVault()
+	vault.AddAccount(*myAccount)
+	data, err := vault.ToBytes()
 
 	if err != nil {
 		fmt.Println("Не удалось сохранить")
 		return
 	}
 
-	files.WriteFile(file, "data.json")
+	files.WriteFile(data, "data.json")
 }

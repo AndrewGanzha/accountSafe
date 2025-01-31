@@ -1,7 +1,6 @@
 package account
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/fatih/color"
@@ -16,16 +15,6 @@ type Account struct {
 	Url       string    `json:"url" xml:"url"`
 	CreatedAt time.Time `json:"createdAt" xml:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt" xml:"updatedAt"`
-}
-
-func (acc *Account) ToBytes() ([]byte, error) {
-	file, err := json.Marshal(acc)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return file, nil
 }
 
 func (acc *Account) generatePassword() {
