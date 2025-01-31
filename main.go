@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"passwordKeep/account"
-	"passwordKeep/files"
 )
 
 func main() {
@@ -56,12 +55,4 @@ func createAccount() {
 
 	vault := account.NewVault()
 	vault.AddAccount(*myAccount)
-	data, err := vault.ToBytes()
-
-	if err != nil {
-		fmt.Println("Не удалось сохранить")
-		return
-	}
-
-	files.WriteFile(data, "data.json")
 }

@@ -5,14 +5,14 @@ import (
 	"os"
 )
 
-func ReadFile() {
-	data, err := os.ReadFile("file.txt")
+func ReadFile(name string) ([]byte, error) {
+	data, err := os.ReadFile("data.json")
 
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	fmt.Println(string(data))
+	return data, nil
 }
 
 func WriteFile(content []byte, name string) {
