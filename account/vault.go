@@ -14,7 +14,8 @@ type Vault struct {
 }
 
 func NewVault() *Vault {
-	file, err := files.ReadFile("data.json")
+	db := files.NewJsonDb("data.json")
+	file, err := db.Read()
 
 	if err != nil {
 		return &Vault{
