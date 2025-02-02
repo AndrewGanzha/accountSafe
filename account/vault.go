@@ -89,6 +89,7 @@ func (vault *Vault) ToBytes() ([]byte, error) {
 }
 
 func (vault *Vault) saveVault() {
+	db := files.NewJsonDb("data.json")
 	vault.UpdatedAt = time.Now()
 	data, err := vault.ToBytes()
 
@@ -96,5 +97,5 @@ func (vault *Vault) saveVault() {
 		color.Red("Не удалось преобразовать файл data.json")
 	}
 
-	files.WriteFile(data, "data.json")
+	db.Write(data)
 }
