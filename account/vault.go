@@ -39,13 +39,7 @@ func NewVault() *Vault {
 
 func (vault *Vault) AddAccount(account Account) {
 	vault.Accounts = append(vault.Accounts, account)
-	vault.UpdatedAt = time.Now()
-	data, err := vault.ToBytes()
-
-	if err != nil {
-		color.Red("Не удалось преобразовать файл data.json")
-	}
-	files.WriteFile(data, "data.json")
+	vault.saveVault()
 }
 
 func (vault *Vault) SearchAccount(search string) ([]Account, error) {
@@ -58,7 +52,29 @@ func (vault *Vault) SearchAccount(search string) ([]Account, error) {
 		}
 	}
 
+	if len(includesAccount) == 0 {
+		color.Red("Аккаунтов не найдено")
+	}
+
 	return includesAccount, nil
+}
+
+func (vault *Vault) DeleteAccountByUrl(url string) bool {
+	var accounts []Account
+	isDeleted := false
+	for _, account := range vault.Accounts {
+		isMatched := strings.Contains(account.Url, url)
+		if !isMatched {
+			accounts = append(accounts, account)
+			continue
+		}
+		isDeleted = true
+	}
+
+	vault.Accounts = accounts
+	vault.saveVault()
+
+	return isDeleted
 }
 
 func (vault *Vault) ToBytes() ([]byte, error) {
@@ -69,4 +85,15 @@ func (vault *Vault) ToBytes() ([]byte, error) {
 	}
 
 	return file, nil
+}
+
+func (vault *Vault) saveVault() {
+	vault.UpdatedAt = time.Now()
+	data, err := vault.ToBytes()
+
+	if err != nil {
+		color.Red("Не удалось преобразовать файл data.json")
+	}
+
+	files.WriteFile(data, "data.json")
 }

@@ -30,5 +30,5 @@ func WriteFile(content []byte, name string) {
 		return
 	}
 
-	fmt.Println("Запись успешна")
+	fmt.Println("Запись успешна изменена")
 }

@@ -30,7 +30,7 @@ Menu:
 		case "2":
 			findAccount(vault)
 		case "3":
-			deleteAccount()
+			deleteAccount(vault)
 		case "4":
 			fmt.Println("До свидания!")
 			break Menu
@@ -39,10 +39,8 @@ Menu:
 }
 
 func findAccount(vault *account.Vault) {
-	var url string
-	fmt.Println("Введите URL для поиска")
-	fmt.Scanln(&url)
-	findsAccount, err := vault.SearchAccount(url)
+
+	findsAccount, err := vault.SearchAccount(askUrl())
 
 	if err != nil {
 		color.Red(err.Error())
@@ -53,8 +51,16 @@ func findAccount(vault *account.Vault) {
 	}
 }
 
-func deleteAccount() {
+func deleteAccount(vault *account.Vault) {
+	vault.DeleteAccountByUrl(askUrl())
+}
 
+func askUrl() string {
+	var url string
+	fmt.Println("Введите URL для поиска")
+	fmt.Scanln(&url)
+
+	return url
 }
 
 func createAccount(vault *account.Vault) {
