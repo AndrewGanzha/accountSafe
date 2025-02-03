@@ -2,11 +2,25 @@ package account
 
 import (
 	"encoding/json"
-	"github.com/fatih/color"
-	"passwordKeep/files"
+	"passwordKeep/output"
 	"strings"
 	"time"
+
+	"github.com/fatih/color"
 )
+
+type ByteReader interface {
+	Read() ([]byte, error)
+}
+
+type ByteWriter interface {
+	Write([]byte)
+}
+
+type Db interface {
+	ByteReader
+	ByteWriter
+}
 
 type Vault struct {
 	Accounts  []Account `json:"accounts"`
@@ -15,10 +29,10 @@ type Vault struct {
 
 type VaultWithDb struct {
 	Vault `json:"vault"`
-	db    files.JsonDb
+	db    Db
 }
 
-func NewVault(db *files.JsonDb) *VaultWithDb {
+func NewVault(db Db) *VaultWithDb {
 	file, err := db.Read()
 
 	if err != nil {
@@ -27,25 +41,28 @@ func NewVault(db *files.JsonDb) *VaultWithDb {
 				Accounts:  []Account{},
 				UpdatedAt: time.Now(),
 			},
-			db: *db,
+			db: db,
 		}
 	}
 
-	var vault VaultWithDb
+	var vault Vault
 	err = json.Unmarshal(file, &vault)
 
 	if err != nil {
-		color.Red("Не удалось разобрать файл data.json")
+		output.PrintError("Не удалось разобрать файл data.json")
 		return &VaultWithDb{
 			Vault: Vault{
 				Accounts:  []Account{},
 				UpdatedAt: time.Now(),
 			},
-			db: *db,
+			db: db,
 		}
 	}
 
-	return &vault
+	return &VaultWithDb{
+		Vault: vault,
+		db:    db,
+	}
 }
 
 func (vault *VaultWithDb) AddAccount(account Account) {
@@ -64,7 +81,7 @@ func (vault *VaultWithDb) SearchAccount(search string) ([]Account, error) {
 	}
 
 	if len(includesAccount) == 0 {
-		color.Red("Аккаунтов не найдено")
+		output.PrintError("Аккаунтов не найдено")
 	}
 
 	return includesAccount, nil

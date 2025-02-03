@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"passwordKeep/account"
 	"passwordKeep/files"
+	"passwordKeep/output"
 )
 
 func main() {
@@ -44,7 +44,7 @@ func findAccount(vault *account.VaultWithDb) {
 	findsAccount, err := vault.SearchAccount(askUrl())
 
 	if err != nil {
-		color.Red(err.Error())
+		output.PrintError(err.Error())
 	}
 
 	for _, findAccount := range findsAccount {
@@ -68,7 +68,7 @@ func createAccount(vault *account.VaultWithDb) {
 	myAccount, err := account.NewAccount()
 
 	if err != nil {
-		fmt.Println("Неверный формат данных")
+		output.PrintError("Неверный формат данных")
 		return
 	}
 	vault.AddAccount(*myAccount)
