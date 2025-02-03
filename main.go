@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"passwordKeep/account"
+	"passwordKeep/files"
 )
 
 func main() {
@@ -12,7 +13,7 @@ func main() {
 
 func showMenu() {
 	fmt.Println("Добро пожаловать в программу гененрации и получения паролей!")
-	vault := account.NewVault()
+	vault := account.NewVault(files.NewJsonDb("data.json"))
 
 Menu:
 	for {
@@ -38,7 +39,7 @@ Menu:
 	}
 }
 
-func findAccount(vault *account.Vault) {
+func findAccount(vault *account.VaultWithDb) {
 
 	findsAccount, err := vault.SearchAccount(askUrl())
 
@@ -51,7 +52,7 @@ func findAccount(vault *account.Vault) {
 	}
 }
 
-func deleteAccount(vault *account.Vault) {
+func deleteAccount(vault *account.VaultWithDb) {
 	vault.DeleteAccountByUrl(askUrl())
 }
 
@@ -63,7 +64,7 @@ func askUrl() string {
 	return url
 }
 
-func createAccount(vault *account.Vault) {
+func createAccount(vault *account.VaultWithDb) {
 	myAccount, err := account.NewAccount()
 
 	if err != nil {

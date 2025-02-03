@@ -13,37 +13,47 @@ type Vault struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func NewVault() *Vault {
-	db := files.NewJsonDb("data.json")
+type VaultWithDb struct {
+	Vault `json:"vault"`
+	db    files.JsonDb
+}
+
+func NewVault(db *files.JsonDb) *VaultWithDb {
 	file, err := db.Read()
 
 	if err != nil {
-		return &Vault{
-			Accounts:  []Account{},
-			UpdatedAt: time.Now(),
+		return &VaultWithDb{
+			Vault: Vault{
+				Accounts:  []Account{},
+				UpdatedAt: time.Now(),
+			},
+			db: *db,
 		}
 	}
 
-	var vault Vault
+	var vault VaultWithDb
 	err = json.Unmarshal(file, &vault)
 
 	if err != nil {
 		color.Red("Не удалось разобрать файл data.json")
-		return &Vault{
-			Accounts:  []Account{},
-			UpdatedAt: time.Now(),
+		return &VaultWithDb{
+			Vault: Vault{
+				Accounts:  []Account{},
+				UpdatedAt: time.Now(),
+			},
+			db: *db,
 		}
 	}
 
 	return &vault
 }
 
-func (vault *Vault) AddAccount(account Account) {
+func (vault *VaultWithDb) AddAccount(account Account) {
 	vault.Accounts = append(vault.Accounts, account)
 	vault.saveVault()
 }
 
-func (vault *Vault) SearchAccount(search string) ([]Account, error) {
+func (vault *VaultWithDb) SearchAccount(search string) ([]Account, error) {
 	var includesAccount []Account
 
 	for _, account := range vault.Accounts {
@@ -60,7 +70,7 @@ func (vault *Vault) SearchAccount(search string) ([]Account, error) {
 	return includesAccount, nil
 }
 
-func (vault *Vault) DeleteAccountByUrl(url string) bool {
+func (vault *VaultWithDb) DeleteAccountByUrl(url string) bool {
 	var accounts []Account
 	isDeleted := false
 	for _, account := range vault.Accounts {
@@ -88,14 +98,13 @@ func (vault *Vault) ToBytes() ([]byte, error) {
 	return file, nil
 }
 
-func (vault *Vault) saveVault() {
-	db := files.NewJsonDb("data.json")
+func (vault *VaultWithDb) saveVault() {
 	vault.UpdatedAt = time.Now()
-	data, err := vault.ToBytes()
+	data, err := vault.Vault.ToBytes()
 
 	if err != nil {
 		color.Red("Не удалось преобразовать файл data.json")
 	}
 
-	db.Write(data)
+	vault.db.Write(data)
 }
