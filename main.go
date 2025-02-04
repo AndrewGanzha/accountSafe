@@ -10,8 +10,9 @@ import (
 
 var menu = map[string]func(db *account.VaultWithDb){
 	"1": createAccount,
-	"2": findAccount,
-	"3": deleteAccount,
+	"2": findAccountByUrl,
+	"3": findAccountByLogin,
+	"4": deleteAccount,
 }
 
 func main() {
@@ -25,8 +26,8 @@ func showMenu() {
 	PropmtData(vault)
 }
 
-func findAccount(vault *account.VaultWithDb) {
-	findsAccount, err := vault.SearchAccountByUrl(askUrl(), func(acc account.Account, str string) bool {
+func findAccountByUrl(vault *account.VaultWithDb) {
+	findsAccount, err := vault.SearchAccountByUrl(askField("URL"), func(acc account.Account, str string) bool {
 		return strings.Contains(acc.Url, str)
 	})
 
@@ -39,8 +40,22 @@ func findAccount(vault *account.VaultWithDb) {
 	}
 }
 
+func findAccountByLogin(vault *account.VaultWithDb) {
+	findsAccount, err := vault.SearchAccountByUrl(askField("логин"), func(acc account.Account, str string) bool {
+		return strings.Contains(acc.Login, str)
+	})
+
+	if err != nil {
+		output.PrintError(err.Error())
+	}
+
+	for _, findAccount := range findsAccount {
+		findAccount.Output()
+	}
+}
+
 func deleteAccount(vault *account.VaultWithDb) {
-	vault.DeleteAccountByUrl(askUrl())
+	vault.DeleteAccountByUrl(askField("url"))
 }
 
 func createAccount(vault *account.VaultWithDb) {
@@ -53,12 +68,12 @@ func createAccount(vault *account.VaultWithDb) {
 	vault.AddAccount(*myAccount)
 }
 
-func askUrl() string {
-	var url string
-	fmt.Println("Введите URL для поиска")
-	fmt.Scanln(&url)
+func askField(field string) string {
+	var searchField string
+	fmt.Println("Введите ", field)
+	fmt.Scanln(&searchField)
 
-	return url
+	return searchField
 }
 
 func PropmtData(vault *account.VaultWithDb) {
@@ -66,9 +81,10 @@ Menu:
 	for {
 		var variant string
 		fmt.Println("1. Добавить аккаунт")
-		fmt.Println("2. Найти аккаунт")
-		fmt.Println("3. Удалить аккаунт")
-		fmt.Println("4. Выход")
+		fmt.Println("2. Найти аккаунт по URL")
+		fmt.Println("3. Найти аккаунт по логину")
+		fmt.Println("4. Удалить аккаунт")
+		fmt.Println("5. Выход")
 
 		fmt.Scanln(&variant)
 
