@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"passwordKeep/account"
+	"passwordKeep/encrypter"
 	"passwordKeep/files"
 	"passwordKeep/output"
 	"strings"
@@ -16,13 +18,19 @@ var menu = map[string]func(db *account.VaultWithDb){
 }
 
 func main() {
+	err := godotenv.Load()
+
+	if err != nil {
+		output.PrintError("Не удалось загрузить .env")
+	}
+
 	showMenu()
 }
 
 func showMenu() {
 	fmt.Println("Добро пожаловать в программу гененрации и получения паролей!")
 
-	vault := account.NewVault(files.NewJsonDb("data.json"))
+	vault := account.NewVault(files.NewJsonDb("data.vault"), *encrypter.NewEncrypter())
 	PropmtData(vault)
 }
 

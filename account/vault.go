@@ -2,6 +2,7 @@ package account
 
 import (
 	"encoding/json"
+	"passwordKeep/encrypter"
 	"passwordKeep/output"
 	"strings"
 	"time"
@@ -30,9 +31,10 @@ type Vault struct {
 type VaultWithDb struct {
 	Vault `json:"vault"`
 	db    Db
+	enc   encrypter.Encrypter
 }
 
-func NewVault(db Db) *VaultWithDb {
+func NewVault(db Db, enc encrypter.Encrypter) *VaultWithDb {
 	file, err := db.Read()
 
 	if err != nil {
@@ -41,21 +43,26 @@ func NewVault(db Db) *VaultWithDb {
 				Accounts:  []Account{},
 				UpdatedAt: time.Now(),
 			},
-			db: db,
+			db:  db,
+			enc: enc,
 		}
 	}
 
+	data := enc.Decrypt(file)
+
 	var vault Vault
-	err = json.Unmarshal(file, &vault)
+	err = json.Unmarshal(data, &vault)
+	color.Cyan("Найдено %d аккаунтов", vault.Accounts)
 
 	if err != nil {
-		output.PrintError("Не удалось разобрать файл data.json")
+		output.PrintError("Не удалось разобрать файл")
 		return &VaultWithDb{
 			Vault: Vault{
 				Accounts:  []Account{},
 				UpdatedAt: time.Now(),
 			},
-			db: db,
+			db:  db,
+			enc: enc,
 		}
 	}
 
@@ -119,10 +126,11 @@ func (vault *Vault) ToBytes() ([]byte, error) {
 func (vault *VaultWithDb) saveVault() {
 	vault.UpdatedAt = time.Now()
 	data, err := vault.Vault.ToBytes()
+	encData := vault.enc.Encrypt(data)
 
 	if err != nil {
-		color.Red("Не удалось преобразовать файл data.json")
+		color.Red("Не удалось преобразовать файл")
 	}
 
-	vault.db.Write(data)
+	vault.db.Write(encData)
 }
